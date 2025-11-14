@@ -1,0 +1,186 @@
+import turtle as t
+
+# Scores
+playerAscore = 0
+playerBscore = 0
+
+# Create window
+window = t.Screen()
+window.title("The Pong Game")
+window.bgcolor("green")
+window.setup(width=800, height=600)
+window.tracer(0)  # Manual update for smooth animation
+
+# Left Paddle
+leftpaddle = t.Turtle()
+leftpaddle.speed(0)
+leftpaddle.shape("square")
+leftpaddle.color("white")
+leftpaddle.shapesize(stretch_wid=5, stretch_len=1)
+leftpaddle.penup()
+leftpaddle.goto(-350, 0)
+
+# Right Paddle
+rightpaddle = t.Turtle()
+rightpaddle.speed(0)
+rightpaddle.shape("square")
+rightpaddle.color("white")
+rightpaddle.shapesize(stretch_wid=5, stretch_len=1)
+rightpaddle.penup()
+rightpaddle.goto(350, 0)  # ← Fixed: was -350
+
+# Ball
+ball = t.Turtle()
+ball.speed(0)
+ball.shape("circle")
+ball.color("red")
+ball.penup()
+ball.goto(0, 0)  # Start at center
+ball_dx = 0.3   # Ball speed X
+ball_dy = 0.3   # Ball speed Y
+
+# Scoreboard
+pen = t.Turtle()
+pen.speed(0)
+pen.color("white")
+pen.penup()
+pen.hideturtle()
+pen.goto(0, 260)
+pen.write("Player A: 0    Player B: 0", align="center", font=('Arial', 24, 'normal'))
+
+# === Paddle Movement Functions ===
+
+# Left Paddle
+def leftpaddleup():
+    y = leftpaddle.ycor()
+    if y < 250:  # Boundary check
+        y += 20
+    leftpaddle.sety(y)
+
+def leftpaddledown():
+    y = leftpaddle.ycor()
+    if y > -250:
+        y -= 20
+    leftpaddle.sety(y)
+
+# Right Paddle
+def rightpaddleup():
+    y = rightpaddle.ycor()
+    if y < 250:
+        y += 20
+    rightpaddle.sety(y)
+
+def rightpaddledown():
+    y = rightpaddle.ycor()
+    if y > -250:
+        y -= 20
+    rightpaddle.sety(y)
+
+# === Keyboard Binding ===
+window.listen()
+window.onkeypress(leftpaddleup, "w")
+window.onkeypress(leftpaddledown, "s")
+window.onkeypress(rightpaddleup, "Up")
+window.onkeypress(rightpaddledown, "Down")
+
+# === Main Game Loop ===
+while True:
+    window.update()  # Update screen
+
+    # Move the ball
+    ball.setx(ball.xcor() + ball_dx)
+    ball.sety(ball.ycor() + ball_dy)
+
+    # Top and Bottom Wall Collision
+    if ball.ycor() > 290:
+        ball.sety(290)
+        ball_dy *= -1  # Reverse Y direction
+
+    if ball.ycor() < -290:
+        ball.sety(-290)
+        ball_dy *= -1
+
+    # Left and Right Wall (Scoring)
+    if ball.xcor() > 390:
+        ball.goto(0, 0)
+        ball_dx *= -1
+        playerAscore += 1
+        pen.clear()
+        pen.write(f"Player A: {playerAscore}    Player B: {playerBscore}",
+                  align="center", font=('Arial', 24, 'normal'))
+
+    if ball.xcor() < -390:
+        ball.goto(0, 0)
+        ball_dx *= -1
+        playerBscore += 1
+        pen.clear()
+        pen.write(f"Player A: {playerAscore}    Player B: {playerBscore}",
+                  align="center", font=('Arial', 24, 'normal'))
+
+    # Paddle and Ball Collisions
+    # Left Paddle
+    if (-340 > ball.xcor() > -350) and (leftpaddle.ycor() + 50 > ball.ycor() > leftpaddle.ycor() - 50):
+        ball.setx(-340)
+        ball_dx *= -1
+
+    # Right Paddle
+    if (340 < ball.xcor() < 350) and (rightpaddle.ycor() + 50 > ball.ycor() > rightpaddle.ycor() - 50):
+        ball.setx(340)
+        ball_dx *= -1
+  
+def rightpaddledown():
+    y=rightpaddle.ycor()
+    y=y+90
+    rightpaddle.sety(y)
+  
+#Assign keys to play
+window.listen()
+window.onkeypress(leftpaddleup,'w')
+window.onkeypress(leftpaddledown,'s')
+window.onkeypress(rightpaddleup,'Up')
+window.onkeypress(rightpaddledown,'Down')
+  
+while True:
+    window.update()
+  
+    #moving the ball
+    ball.setx(ball.xcor()+ballxdirection)
+    ball.sety(ball.ycor()+ballxdirection)
+  
+    #border set up
+    if ball.ycor()>290:
+        ball.sety(290)
+        ballydirection=ballydirection*-1
+    if ball.ycor()<-290:
+        ball.sety(-290)
+        ballydirection=ballydirection*-1
+          
+    if ball.xcor() > 390:
+        ball.goto(0,0)
+        ball_dx = ball_dx * -1
+        player_a_score = player_a_score + 1
+        pen.clear()
+        pen.write("Player A: {}                    Player B: {} ".format(player_a_score,player_b_score),align="center",font=('Monaco',24,"normal"))
+        os.system("afplay wallhit.wav&")
+  
+  
+  
+    if(ball.xcor()) < -390: # Left width paddle Border
+        ball.goto(0,0)
+        ball_dx = ball_dx * -1
+        player_b_score = player_b_score + 1
+        pen.clear()
+        pen.write("Player A: {}                    Player B: {} ".format(player_a_score,player_b_score),align="center",font=('Monaco',24,"normal"))
+        os.system("afplay wallhit.wav&")
+  
+     # Handling the collisions with paddles.
+  
+    if(ball.xcor() > 340) and (ball.xcor() < 350) and (ball.ycor() < rightpaddle.ycor() + 40 and ball.ycor() > rightpaddle.ycor() - 40):
+        ball.setx(340)
+        ball_dx = ball_dx * -1
+        os.system("afplay paddle.wav&")
+  
+    if(ball.xcor() < -340) and (ball.xcor() > -350) and (ball.ycor() < leftpaddle.ycor() + 40 and ball.ycor() > leftpaddle.ycor() - 40):
+        ball.setx(-340)
+        ball_dx = ball_dx * -1
+        os.system("afplay paddle.wav&")
